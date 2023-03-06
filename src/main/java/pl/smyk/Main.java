@@ -15,6 +15,10 @@ public class Main {
         String password = "admin";
         Connection connection = null;
 
+        // 1. zapis całej kolekcji -> wczytanie całej zawartości, zapis całej kolekcji, koniec połączenia z bazą
+        // 2. zapis pojedyńczego rekordu -> wyczytać jeden rekord, zmierzyć czas zapisu, koniec połączenia z bazą (procedure powtórzyć na wszystkich rekordach)
+
+
         try {
             connection = DriverManager.getConnection(dbUrl, username, password);
 
