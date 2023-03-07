@@ -10,19 +10,23 @@ import java.sql.SQLException;
 public class Main {
     public static void main(String[] args) throws SQLException {
         String csvFileName = "C:\\Users\\Kamil\\Desktop\\kody.csv";
-        String dbUrl = "jdbc:mysql://localhost:3306/testdb";
-        String username = "root";
+        String dbUrl = "jdbc:postgresql://localhost:5432/mydb";
+        String username = "postgres";
         String password = "admin";
         Connection connection = null;
 
         // 1. zapis całej kolekcji -> wczytanie całej zawartości, zapis całej kolekcji, koniec połączenia z bazą
         // 2. zapis pojedyńczego rekordu -> wyczytać jeden rekord, zmierzyć czas zapisu, koniec połączenia z bazą (procedure powtórzyć na wszystkich rekordach)
+        // + 2 wybrane metody
+        // 3. ORM -> hibernate
+        // 4. bulk copy - komenda copy
 
 
         try {
             connection = DriverManager.getConnection(dbUrl, username, password);
+            connection.setAutoCommit(false);
 
-            String createTableSQL = "CREATE TABLE IF NOT EXISTS kody (id INT PRIMARY KEY AUTO_INCREMENT, post_code VARCHAR (255), adress VARCHAR(255), voivoship VARCHAR(255), county VARCHAR(255))";
+            String createTableSQL = "CREATE TABLE IF NOT EXISTS kody (id SERIAL PRIMARY KEY, post_code VARCHAR (255), adress VARCHAR(255), voivoship VARCHAR(255), county VARCHAR(255))";
             connection.createStatement().execute(createTableSQL);
 
             String insertSql = "INSERT INTO kody (post_code, adress, voivoship, county) VALUES (?, ?, ?, ?)";
