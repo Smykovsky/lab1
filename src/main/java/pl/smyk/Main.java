@@ -26,7 +26,7 @@ public class Main {
             connection = DriverManager.getConnection(dbUrl, username, password);
             connection.setAutoCommit(false);
 
-            String createTableSQL = "CREATE TABLE IF NOT EXISTS kody (id SERIAL PRIMARY KEY, post_code VARCHAR (255), adress VARCHAR(255), voivoship VARCHAR(255), county VARCHAR(255))";
+            String createTableSQL = "CREATE TABLE IF NOT EXISTS kody (id SERIAL PRIMARY KEY, post_code VARCHAR (10), adress VARCHAR(100), voivoship VARCHAR(100), county VARCHAR(50))";
             connection.createStatement().execute(createTableSQL);
 
             String insertSql = "INSERT INTO kody (post_code, adress, voivoship, county) VALUES (?, ?, ?, ?)";
@@ -54,6 +54,7 @@ public class Main {
 
                 statement.executeUpdate();
             }
+
 
             connection.commit();
             connection.close();
