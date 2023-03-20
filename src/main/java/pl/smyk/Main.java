@@ -58,9 +58,8 @@ public class Main {
                 statement.addBatch();
             }
             statement.executeBatch();
-            long endTime = System.currentTimeMillis();
 
-            System.out.println("CZAS ZAPISU: " + (endTime - startTime) + "miliseconds");
+            System.out.println("CZAS ZAPISU: " + (System.currentTimeMillis() - startTime) + "miliseconds");
             System.out.println(statement.getQueryTimeout());
 
         } catch (SQLException e) {
