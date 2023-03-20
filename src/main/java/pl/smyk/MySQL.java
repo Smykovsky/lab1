@@ -5,13 +5,13 @@ import com.zaxxer.hikari.HikariDataSource;
 import lombok.Getter;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-import java.util.logging.Logger;
 
-public class PostgreSQL {
+public class MySQL {
     private final String host;
     private final int port;
     private final String dbName;
@@ -22,36 +22,52 @@ public class PostgreSQL {
     @Getter
     private HikariDataSource hikari;
 
-    public PostgreSQL(String host, int port, String dbName, String user, String password, int pool, int threadpool) {
+    public MySQL(String host, int port, String dbName, String user, String password, int pool, int threadpool) {
         this.host = host;
         this.port = port;
         this.dbName = dbName;
         this.user = user;
-        this.password =password;
+        this.password = password;
         this.pool = pool;
         this.executor = Executors.newScheduledThreadPool(threadpool);
+        this.connect();
     }
 
     private void connect() {
         HikariConfig hikariConfig = new HikariConfig();
-        hikariConfig.setJdbcUrl("jdbc:postgresql://" + this.host + ":" + this.port + "/" + this.dbName);
+        hikariConfig.setJdbcUrl("jdbc:mysql://" + this.host + ":" + this.port + "/" + this.dbName);
         hikariConfig.setUsername(this.user);
-        hikariConfig.setPassword(password);
+        hikariConfig.setPassword(this.password);
         hikariConfig.addDataSourceProperty("cachePrepStmts", "true");
         hikariConfig.addDataSourceProperty("prepStmtCacheSize", "250");
         hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
         hikariConfig.setMaximumPoolSize(this.pool);
-        this.hikari = new HikariDataSource();
+        this.hikari = new HikariDataSource(hikariConfig);
         try {
             if (this.getHikari().getConnection() != null) {
-                System.out.println("Nawiązano połączenie z POSTGRESQL!");
+                Logger.warning("Połączono z mysql!");
             }
         } catch (SQLException e) {
-            System.out.println("BŁĄD!");
+            Logger.warning("Nie udało połaczyć się z mysql!");
         }
     }
 
-    private void close(Connection connection) {
+    public void update(String u) {
+        Connection connection = null;
+        PreparedStatement statement = null;
+        try {
+            connection = this.getHikari().getConnection();
+            statement = connection.prepareStatement(u);
+            statement.execute();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            close(connection);
+            close(statement);
+        }
+    }
+
+    public void close(Connection connection) {
         if (connection == null) {
             try {
                 connection.close();
@@ -61,7 +77,7 @@ public class PostgreSQL {
         }
     }
 
-    private void close(Statement statement) {
+    public void close(Statement statement) {
         if (statement == null) {
             try {
                 statement.close();
@@ -69,5 +85,17 @@ public class PostgreSQL {
                 System.out.println("Błąd podczas zamykania statementa!");
             }
         }
+    }
+
+    public void updateAsync(String u) {
+        this.executor.execute(() -> MySQL.this.update(u));
+    }
+
+    public void CREATETABLE(String table, String values) {
+        updateAsync("CREATE TABLE IF NOT EXISTS " + table + " (id int(11) AUTO_INCREMENT PRIMARY KEY, " + values + ");");
+    }
+
+    public void INSERT(String table, String values, String q) {
+        updateAsync("INSERT INTO " + table + "` (id, " + values + ") VALUES (NULL, '" + q + "');");
     }
 }
