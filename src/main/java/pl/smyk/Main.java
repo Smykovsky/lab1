@@ -9,16 +9,17 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SQLException {
 
         String csvFileName = "C:\\Users\\kamil.smyk\\Pulpit\\kody.csv";
-//        String dbUrl = "jdbc:postgresql://localhost:5432/mydb";
-//        String username = "postgres";
+//        String dbUrl = "jdbc:mysql://localhost:3306/mydb";
+//        String username = "root";
 //        String password = "admin";
 //        Connection connection = null;
 
@@ -39,34 +40,29 @@ public class Main {
 
 
         try {
-            long startTime = System.currentTimeMillis();
             connection = mySQL.getHikari().getConnection();
+            connection.setAutoCommit(false);
             statement = connection.prepareStatement("INSERT INTO kody (post_code, adress, voivoship, county) VALUES (?, ?, ?, ?)");
             BufferedReader reader = new BufferedReader(new FileReader(csvFileName));
             reader.readLine();
+            long startTime = System.currentTimeMillis();
             while ((record = reader.readLine()) != null) {
                 String[] data = record.split(";");
-                String postCode = data[0];
-                String adress = data[1];
-                String voivoship = data[2];
-                String county = data[3];
-
-                statement.setString(1, postCode);
-                statement.setString(2, adress);
-                statement.setString(3, voivoship);
-                statement.setString(4, county);
-                statement.addBatch();
+                statement.setString(1, data[0]);
+                statement.setString(2, data[1]);
+                statement.setString(3, data[2]);
+                statement.setString(4, data[3]);
+                statement.executeUpdate();
             }
-            statement.executeBatch();
-
             System.out.println("CZAS ZAPISU: " + (System.currentTimeMillis() - startTime) + "miliseconds");
-            System.out.println(statement.getQueryTimeout());
+
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
         } catch (IOException e) {
             throw new RuntimeException(e);
-        } finally {
+        }
+        finally {
             mySQL.close(statement);
             mySQL.close(connection);
         }
@@ -76,16 +72,16 @@ public class Main {
 //            connection = DriverManager.getConnection(dbUrl, username, password);
 //            connection.setAutoCommit(false);
 //
-//            String createTableSQL = "CREATE TABLE IF NOT EXISTS kody (id SERIAL PRIMARY KEY, post_code VARCHAR (10), adress VARCHAR(100), voivoship VARCHAR(100), county VARCHAR(50))";
+//            String createTableSQL = "CREATE TABLE IF NOT EXISTS kody (id AUTO_INCREMENT PRIMARY KEY, post_code VARCHAR (10), adress VARCHAR(100), voivoship VARCHAR(100), county VARCHAR(50))";
 //            connection.createStatement().execute(createTableSQL);
 //
 //            String insertSql = "INSERT INTO kody (post_code, adress, voivoship, county) VALUES (?, ?, ?, ?)";
-//            PreparedStatement statement = connection.prepareStatement(insertSql);
+//            statement = connection.prepareStatement(insertSql);
 //
 //            FileReader fileReader = new FileReader(csvFileName);
 //            BufferedReader reader = new BufferedReader(fileReader);
 //
-//            String record = null;
+////            String record = null;
 //
 //            reader.readLine();
 //
