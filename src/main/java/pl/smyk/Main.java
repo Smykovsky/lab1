@@ -85,7 +85,7 @@ public class Main {
 
 
 
-        // 1. zapis całej kolekcji -> wczytanie całej zawartości, zapis całej kolekcji, koniec połączenia z bazą
+//         1. zapis całej kolekcji -> wczytanie całej zawartości, zapis całej kolekcji, koniec połączenia z bazą
 //        try {
 //            connection = mySQL.getHikari().getConnection();
 //            connection.setAutoCommit(false);
@@ -93,6 +93,8 @@ public class Main {
 //            BufferedReader reader = new BufferedReader(new FileReader(csvFileName));
 //            reader.readLine();
 //            long startTime = System.currentTimeMillis();
+//            StopWatch stopWatch = new StopWatch();
+//            stopWatch.start();
 //            while ((record = reader.readLine()) != null) {
 //                String[] data = record.split(";");
 //
@@ -108,8 +110,8 @@ public class Main {
 //                statement.addBatch();
 //            }
 //            statement.executeBatch();
-//            connection.commit();
-//            System.out.println("CZAS ZAPISU: " + (System.currentTimeMillis() - startTime) + "miliseconds");
+//            stopWatch.stop();
+//            System.out.println("CZAS ZAPISU: " + (stopWatch.getStopTime() - stopWatch.getStartTime()) + "miliseconds");
 //
 //
 //        } catch (SQLException e) {
