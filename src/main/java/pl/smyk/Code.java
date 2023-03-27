@@ -7,7 +7,6 @@ import lombok.Setter;
 
 import javax.persistence.*;
 
-
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -25,5 +24,4 @@ public class Code {
     private String voivoship;
     @Column(name = "county")
     private String county;
-
 }
