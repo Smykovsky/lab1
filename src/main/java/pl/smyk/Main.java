@@ -23,7 +23,9 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 
@@ -33,20 +35,18 @@ public class Main {
     public static void main(String[] args) throws SQLException {
 
         String csvFileName = "C:\\Users\\kamil.smyk\\Pulpit\\kody.csv";
-//        String dbUrl = "jdbc:mysql://localhost:3306/mydb";
-//        String username = "root";
-//        String password = "admin";
-//        Connection connection = null;
+        String dbUrl = "jdbc:mysql://localhost:3306/mydb";
+        String username = "root";
+        String password = "admin";
 
         // 1. zapis całej kolekcji -> wczytanie całej zawartości, zapis całej kolekcji, koniec połączenia z bazą
         // 2. zapis pojedyńczego rekordu -> wyczytać jeden rekord, zmierzyć czas zapisu, koniec połączenia z bazą (procedure powtórzyć na wszystkich rekordach)
-        // + 2 wybrane metody
         // 3. ORM -> hibernate
-        // 4. bulk copy - komenda copy
+
 
 
         final MySQL mySQL = new MySQL("localhost", 3306, "mydb", "root", "admin",4, 4);
-        mySQL.CREATETABLE("code", "post_code VARCHAR(10), adress VARCHAR(100), voivoship VARCHAR(100), county VARCHAR(50)");
+        mySQL.CREATETABLE("code", "post_code VARCHAR(6), adress VARCHAR(103), voivoship VARCHAR(27), county VARCHAR(33)");
 
         String record = null;
         long rowCount = 0;
@@ -55,40 +55,40 @@ public class Main {
         PreparedStatement statement = null;
 
 //         1. zapis całej kolekcji -> wczytanie całej zawartości, zapis całej kolekcji, koniec połączenia z bazą
-        try {
-            connection = mySQL.getHikari().getConnection();
-            statement = connection.prepareStatement("INSERT INTO code (post_code, adress, voivoship, county) VALUES (?, ?, ?, ?)");
-            BufferedReader reader = new BufferedReader(new FileReader(csvFileName));
-            reader.readLine();
-            StopWatch stopWatch = new StopWatch();
-            stopWatch.start();
-            while ((record = reader.readLine()) != null) {
-                String[] data = record.split(";");
-
-                String postCode = data[0];
-                String adress = data[1];
-                String voivoship = data[2];
-                String county = data[3];
-
-                statement.setString(1, postCode);
-                statement.setString(2, adress);
-                statement.setString(3, voivoship);
-                statement.setString(4, county);
-                statement.addBatch();
-            }
-            statement.executeBatch();
-            stopWatch.stop();
-            System.out.println("CZAS ZAPISU: " + (stopWatch.getStopTime() - stopWatch.getStartTime()) + "miliseconds");
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        finally {
-            mySQL.close(statement);
-            mySQL.close(connection);
-        }
+//        try {
+//            connection = mySQL.getHikari().getConnection();
+//            statement = connection.prepareStatement("INSERT INTO code (post_code, adress, voivoship, county) VALUES (?, ?, ?, ?)");
+//            BufferedReader reader = new BufferedReader(new FileReader(csvFileName));
+//            reader.readLine();
+//            StopWatch stopWatch = new StopWatch();
+//            stopWatch.start();
+//            while ((record = reader.readLine()) != null) {
+//                String[] data = record.split(";");
+////
+////                String postCode = data[0];
+////                String adress = data[1];
+////                String voivoship = data[2];
+////                String county = data[3];
+//
+//                statement.setString(1, data[0]);
+//                statement.setString(2, data[1]);
+//                statement.setString(3, data[2]);
+//                statement.setString(4, data[3]);
+//                statement.addBatch();
+//            }
+//            statement.executeBatch();
+//            stopWatch.stop();
+//            System.out.println("CZAS ZAPISU: " + (stopWatch.getStopTime() - stopWatch.getStartTime()) + "miliseconds");
+//
+//        } catch (SQLException e) {
+//            throw new RuntimeException(e);
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+//        finally {
+//            mySQL.close(statement);
+//            mySQL.close(connection);
+//        }
 
         // 2. zapis pojedyńczego rekordu -> wyczytać jeden rekord, zmierzyć czas zapisu, koniec połączenia z bazą (procedure powtórzyć na wszystkich rekordach)
 //        try {
@@ -114,6 +114,7 @@ public class Main {
 //
 //                rowCount++;
 //            }
+//
 //            stopWatchFull.stop();
 //
 //            long duration = stopWatchFull.getStopTime() - stopWatchFull.getStartTime();
